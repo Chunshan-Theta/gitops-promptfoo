@@ -1,2 +1,2 @@
 # gitops-promptfoo
-host promptfoo in self-server
+follow the [doc](https://www.promptfoo.dev/docs/usage/self-hosting/)
