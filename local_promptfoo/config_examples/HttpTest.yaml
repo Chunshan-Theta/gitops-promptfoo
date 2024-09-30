@@ -1,0 +1,40 @@
+defaultTest: {}
+description: My eval
+env: {}
+evaluateOptions: {}
+prompts:
+  - Write a tweet about {{topic}}
+  - Write a concise, funny tweet about {{topic}}
+providers:
+  - ollama:chat:llama3.1
+  - id: https://<host>/api/v1/chat/completions
+    config:
+      method: POST
+      headers:
+        Content-Type: application/json
+        Authorization: Bearer <key>
+      body:
+        chatId: test-20240930-0
+        stream: 'false'
+        detail: 'false'
+        messages:
+          - content: '{{prompt}}'
+            role: user
+      responseParser: json.choices[0].message.content
+scenarios: []
+tests:
+  - vars:
+      topic: bananas
+  - vars:
+      topic: avocado toast
+    assert:
+      - type: icontains
+        value: avocado
+      - type: javascript
+        value: 1 / (output.length + 1)
+  - vars:
+      topic: new york city
+    assert:
+      - type: llm-rubric
+        value: ensure that the output is kindly and friendly
+        provider: ollama:chat:llama3.1
