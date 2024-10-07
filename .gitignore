@@ -3,3 +3,4 @@ local_promptfoo/cache
 run-ollama.sh
 **/private_*.py
 **/_*.*
+.DS*
