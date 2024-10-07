@@ -1,0 +1,121 @@
+description: My eval
+env: {}
+evaluateOptions: {}
+prompts:
+  - >-
+    {{ homework_question }}
+    
+providers:
+  - id: https://<host>/api/v1/chat/completions
+    config:
+      method: POST
+      headers:
+        Content-Type: application/json
+        Authorization: >-
+          Bearer fastgpt-yFPnAMu6G76MAw3Z4oBPzyhtorfxD4DBZljKbIZ3kUkgxUUsr1HMuxiaTG
+
+      body:
+        chatId: test-20240930-0
+        stream: 'false'
+        detail: 'false'
+        messages:
+          - content: '{{system_prompt}}'
+            role: system
+          - content: '{{prompt}}'
+            role: user
+          
+      responseParser: json.choices[0].message.content
+scenarios: []
+tests:
+  - vars:
+      homework_question: >-
+       If a bone is an example of an organ, then all of the bones in the body are part of a(n) ecosystem. population. organ system. organelle.
+      system_prompt: >-
+       solve the math problem      
+    assert:
+      - type: contains-all
+        value:
+          - organ system
+  - vars:
+      homework_question: >-
+        In healthy people, it is good practice to use isotonic solutions for injections into veins of the circulatory system because isotonic solutions maintain the normal volume and function of red blood cells $\qquad$ hypertonic solutions cause red blood cells to swell and lyse hypotonic solutions cause red blood cells to crenate
+      system_prompt: >-
+        You are a very helpful math expert.You will be provided a question need to be solved 
+
+        Let's work this out it a step by step to be sure we have the right answer.
+        You also need to list the concept and theory of the question.
+        The following parts provides more advanced and precise restrictions and descriptions for the output results.
+
+        ##################
+        # Rules #
+        - Your output must include [step] section and one [answer] and one [concept] section
+        - In [step] :  
+                - Step-by-step problem-solving process.
+                - each [step] must include one "# i" and one "# c"
+                - # i ：instruction, What should you do in this step? Use concise sentences
+                - # c ：calculation, Concrete operation in this step
+        - In [answer] :                
+                - the right answer of the problem.
+                - If it is a choice question, you need to fill in the answer choices
+        - In [concept] :
+                - concept in the question, in at most 5 words.
+                - Use concepts common to middle school and college as much as possible
+        - Your response must not include "##" tag.
+        - Mathematical expressions need to be displayed in LaTeX format.
+        - Do not enclose LaTeX content with "```" symbol.
+
+        ##################
+        # Output Format Examples #
+
+        Input
+        '''
+        Solve : -5x+4y = 3,  x=2y-15 ;  x=? y=?
+        '''
+
+        Output 
+        '''
+        [step]
+        # i
+        Substitute the value of x from the second equation into the first equation
+        # c
+        -5(2y-15) + 4y = 3
+        [step]
+        # i
+        Simplify the equation
+        # c
+        -10y + 75 + 4y = 3
+        [step]
+        # i
+        Combine like terms
+        [calculation]
+        -6y + 75 = 3
+        [step]
+        # i
+        Subtract 75 from both sides
+        # c
+        -6y = -72
+        [step]
+        # i
+        Divide by -6
+        # c
+        y = 12
+        [step]
+        # i
+        substitute y back into the second equation to find x
+        # c
+        x = 2(12) - 15.
+        [step]
+        # i
+        Calculate
+        # c
+        x = 24 - 15,The value of x is 9.
+        [Answer]
+        x=9
+        [Concept]
+        linear equation
+        '''      
+    assert:
+      - type: python
+        value: file:///root/local_files/assert_example.py
+        config:
+          rubrics: "the input have similar topics with following texts:\n`In healthy individuals, the use of isotonic solutions for intravenous administration is considered best practice, primarily because these solutions help maintain normal volume and function of red blood cells.`"
